@@ -1,49 +1,143 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Validation from "./LoginValidation";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min";
 
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
-function Login(){
-    const [email, setEmail] = useState("")
-    const [password, setPassword] = useState("")
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        axios.post('http://localhost:9000/login', {email, password})
-        .then(result => console.log(result))
-        .catch(err => console.log(err))
+    const newValues = { email, password };
+    const validationErrors = Validation(newValues);
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) {
+      return;
     }
 
-    return (
-        <div className='d-flex justify-content-center align-items-center bg-secondary vh-100'>
-            <div className='bg-white p-3 rounded w-25'>
-                <h2>Login</h2>
-                <form onSubmit={handleSubmit}>
-                    <div className='mb-3'>
-                        <label htmlFor='email'>
-                            <strong>Email</strong>
-                        </label>
-                        <input type='text' placeholder='Enter email' autoComplete='off' name='email' className='form-control rounded-0'
-                        onChange={(e) => setEmail(e.target.value)} />
-                    </div>
+    axios.post('http://localhost:8000/api/auth/login', { email, password })
+      .then((response) => {
+        toast.success("✅ Login Successful!", {
+          position: "top-center",
+          autoClose: 2000,
+        });
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 2000);
+      })
+      .catch((error) => {
+        if (error.response) {
+          toast.error(`Error:  ${error.response.data.error}`, {
+            position: "top-center",
+          });
+        } else {
+          toast.error(" Unable to connect to server!", {
+            position: "top-center",
+          });
+        }
+      });
+  };
 
-                    <div className='mb-3'>
-                        <label htmlFor='password'>
-                            <strong>Password</strong>
-                        </label>
-                        <input type='password' placeholder='Enter password' autoComplete='off' name='password' className='form-control rounded-0' 
-                        onChange={(e) => setPassword(e.target.value)}/>
-                    </div>
-                    <button type='submit' className='btn btn-success w-100 rounded-0'>Login</button>
-                    </form>
-                    <p>Don't Have an Account?</p>
-                    <Link  to="/register" className='btn btn-default border w-100 bg-light rounded-0 text-decoration-none'>Register</Link>
+  return (
+    <div
+      className="min-vh-100 d-flex justify-content-center align-items-center"
+      style={{
+        backgroundImage: `url("/images/image.png")`, 
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        position: "relative",
+      }}
+    >
+      {/* Dark overlay for readability */}
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(0,0,0,0.5)",
+        }}
+      ></div>
 
-               
-            </div>
+      {/* Login Card */}
+      <div
+        className="card p-4"
+        style={{
+          width: "350px",
+          zIndex: 1, // Ensure card is above overlay
+          borderRadius: "8px",
+        }}
+      >
+        <h2 className="text-center mb-4">Login</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <label htmlFor="email">
+              <strong>Email</strong>
+            </label>
+            <input
+              type="email"
+              placeholder="Enter email"
+              autoComplete="off"
+              className="form-control rounded-0"
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            {errors.email && <span className="text-danger">{errors.email}</span>}
+          </div>
+
+          <div className="mb-3">
+            <label htmlFor="password">
+              <strong>Password</strong>
+            </label>
+            <input
+              type="password"
+              placeholder="Enter password"
+              autoComplete="off"
+              className="form-control rounded-0"
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            {errors.password && (
+              <span className="text-danger">{errors.password}</span>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="btn w-100"
+            style={{
+              backgroundColor: "#0D47A1", 
+              color: "#fff",
+              borderRadius: "0",
+            }}
+          >
+            Login
+          </button>
+        </form>
+
+        <div className="mt-3">
+          <Link to="/forgot-password" className="text-decoration-none">
+            Forgot Password?
+          </Link>
         </div>
-    )
-
+        <div className="mt-2">
+          <Link to="/register" className="btn btn-outline-success w-100">
+            Signup
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default Login;
