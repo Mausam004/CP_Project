@@ -1,0 +1,79 @@
+/* Bus Pass Styling */
+.bus-pass-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f9f9f9;
+    font-family: 'Poppins', sans-serif;
+}
+
+.bus-pass-card {
+    width: 500px;
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.bus-pass-header {
+    background-color: #247b97;
+    color: white;
+    padding: 15px;
+    border-radius: 10px 10px 0 0;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.pass-photo {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border: 3px solid #247b97;
+    margin-top: 15px;
+}
+
+.pass-info {
+    text-align: left;
+    padding: 20px;
+    font-size: 16px;
+    color: #333;
+}
+
+.pass-info p {
+    margin: 5px 0;
+}
+
+.pass-info strong {
+    color: #247b97;
+}
+
+.pass-footer {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 0 0 10px 10px;
+    font-size: 14px;
+    color: #666;
+}
+
+.download-pass-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    background-color: #247b97;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.download-pass-btn:hover {
+    background-color: #e0ecff;
+    color: #247b97;
+}

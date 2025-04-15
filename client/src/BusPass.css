@@ -1,0 +1,40 @@
+/* Background Styling */
+.buspass-container {
+    background: linear-gradient(to bottom, #cce5ff, #ffffff, #ffeb99); /* Sky Blue → White → Soft Yellow */
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  /* Card Styling */
+  .custom-card {
+    background: linear-gradient(to right, #001f3f, #003366); /* Dark Navy Blue */
+    padding: 25px;
+    color: white;
+    max-width: 500px;
+    width: 100%;
+  }
+  
+  /* Form Inputs */
+  .form-control {
+    border-radius: 10px;
+    border: 1px solid #ccc;
+  }
+  
+  /* Submit Button */
+  .btn-warning {
+    background:  #08417f; /* Golden Yellow */
+    border: none;
+    color: rgb(3, 18, 83);
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    transition: 0.3s ease-in-out;
+  }
+  
+  .btn-warning:hover {
+    background: linear-gradient(to right, #ffb700, #ffcc33);
+    color: #003366;
+  }

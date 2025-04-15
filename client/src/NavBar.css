@@ -1,0 +1,107 @@
+/* Navbar Styles */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: #f3eded;
+    position: fixed;
+    inset: 0 0 auto 0;
+    width: 100%;
+    z-index: 1000;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Change navbar color on scroll */
+.navbar.scrolled {
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo Styling */
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #064b96; /* Blue color */
+}
+
+.black-text {
+    color: #0056b3; /* Blue color */
+}
+
+.blue-text {
+    color: #0056b3; /* Blue */
+    font-family: 'cursive';
+}
+
+/* Navigation Links */
+.nav-link-detail {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    font-family: monospace;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #0056b3; /* Blue text */
+    transition: color 0.3s ease;
+    letter-spacing: 1px;
+}
+
+/* Hover Effect - Darker Shade of Blue */
+.nav-links a:hover,
+.nav-links .active {
+    color: #003366; /* Dark blue */
+}
+
+/* Navbar color change on scroll */
+.navbar.scrolled .nav-links a {
+    color: #003366; /* Dark blue */
+}
+
+.navbar.scrolled .logo {
+    color: #003366; /* Dark blue */
+}
+
+/* Login & Register Button Styles */
+.login-btn,
+.register-btn {
+    background: #0056b3; /* Blue */
+    color: white;
+    padding: 10px 20px;
+    border: 2px solid #0056b3;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+/* Hover - Darker Shade of Blue */
+.login-btn:hover,
+.register-btn:hover {
+    background: #003366; /* Dark blue */
+    border-color: #003366;
+}
+
+/* On scroll, buttons adapt */
+.navbar.scrolled .login-btn,
+.navbar.scrolled .register-btn {
+    color: #0056b3;
+    border: 2px solid #0056b3;
+}
+
+.navbar.scrolled .login-btn:hover,
+.navbar.scrolled .register-btn:hover {
+    background: #003366; /* Dark blue */
+    color: white;
+}

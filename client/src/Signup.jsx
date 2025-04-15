@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { toast } from "react-toastify";
+import { toast,ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Validation from './SignupValidation';
@@ -13,7 +13,13 @@ export default function Signup() {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleBlur = (e) => {
+    // If the input is invalid when the user leaves the field, show a toast
+    if (!e.target.validity.valid) {
+      toast.error("Please enter a valid email address");
+    }
+  };
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newValues = { name, email, password };
     const validationErrors = Validation("", newValues);
@@ -23,36 +29,32 @@ export default function Signup() {
       toast.error("Please enter valid values");
       return;
     }
-    axios.post('http://localhost:8000/api/auth/register', { name, email, password })
-      .then((response) => {
-        toast.success("✅ Account Created Successfully!", {
+    try{
+    const response = await axios.post('http://localhost:8000/api/auth/register', { name, email, password })
+     
+        toast.success(response.data.message, {
           position: "top-center",
           autoClose: 2000
         });
-        setTimeout(() => {
-          navigate("/login");
-        }, 2000);
-      })
-      .catch((error) => {
-        if (error.response) {
-          toast.error(`${error.response.data.error}`, { position: "top-center" });
-        } else {
-          toast.error("⚠️ Unable to connect to server!", { position: "top-center" });
+        if(response.data.success){
+          navigate("/login");}
+      }
+      catch(error){
+          toast.error(error?.response?.data?.message);
         }
-      });
-  };
+      }
 
   return (
     <div
       className="min-vh-100 d-flex justify-content-center align-items-center"
       style={{
-        backgroundImage: `url("/images/image.png")`, // Full background image
+        backgroundImage: `url("/images/image.png")`, 
         backgroundSize: "cover",
         backgroundPosition: "center",
         position: "relative",
       }}
     >
-      {/* Dark overlay for readability */}
+     
       <div
         style={{
           position: "absolute",
@@ -87,7 +89,16 @@ export default function Signup() {
               onChange={(e) => {
                 setName(e.target.value);
                 const error1 = Validation("checkName", { name: e.target.value, email, password });
-                setErrors(prev => ({ ...prev, ...error1 }));
+                setErrors((prev) => {
+                  const updatedErrors = { ...prev, ...error1 };
+            
+                  // Remove email error if email is now valid
+                  if (!error1.name) {
+                    delete updatedErrors.name;
+                  }
+            
+                  return updatedErrors;
+                });
               }}
               required
             />
@@ -105,8 +116,19 @@ export default function Signup() {
               onChange={(e) => {
                 setEmail(e.target.value);
                 const error1 = Validation("checkEmail", { name, email: e.target.value, password });
-                setErrors(prev => ({ ...prev, ...error1 }));
+            
+                setErrors((prev) => {
+                  const updatedErrors = { ...prev, ...error1 };
+            
+                  // Remove email error if email is now valid
+                  if (!error1.email) {
+                    delete updatedErrors.email;
+                  }
+            
+                  return updatedErrors;
+                });
               }}
+              onBlur={handleBlur}
               required
             />
             {errors?.email && <span className="text-danger">{errors.email}</span>}
@@ -148,6 +170,7 @@ export default function Signup() {
           Login
         </Link>
       </div>
+      <ToastContainer/>
     </div>
   );
 }

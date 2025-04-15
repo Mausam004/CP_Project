@@ -1,25 +1,26 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast ,ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function ResetPassword() {
-    const [email, setEmail] = useState("");      // ✅ Email state         
-    const [password, setPassword] = useState(""); // ✅ Password state
+    const [email, setEmail] = useState("");      
+    const [password, setPassword] = useState(""); 
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!email || !password) {
-            toast.error("Please fill in all fields."); // ✅ Frontend validation
+        if (!email  || !password) {
+            toast.error("Please fill in all fields."); 
             return;
         }
 
         try {
             const response = await axios.post("http://localhost:8000/api/auth/reset-password", {
                 email,
+                
                 password
             });
 
@@ -52,6 +53,8 @@ function ResetPassword() {
                             required
                         />
                     </div>
+
+
                     <div className='mb-3'>
                         <label htmlFor='password'><strong>New Password</strong></label>
                         <input
@@ -67,6 +70,7 @@ function ResetPassword() {
                     <button type='submit' className='btn btn-success w-100 rounded-0'>Update Password</button>
                 </form>
             </div>
+            <ToastContainer />
         </div>
     );
 }

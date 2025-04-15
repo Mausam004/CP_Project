@@ -3,10 +3,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { useParams } from "react-router-dom";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
-const OtpFrom= () => {
+const OtpForm= () => {
    const navigate = useNavigate();
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [timer, setTimer] = useState(60);
@@ -134,4 +134,4 @@ const OtpFrom= () => {
   );
 };
 
-export default OtpFrom;
+export default OtpForm;

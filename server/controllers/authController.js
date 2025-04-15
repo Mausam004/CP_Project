@@ -2,6 +2,27 @@ import bcrypt from "bcrypt";
 import db from "../config/db.js";
 import { Mail } from "../config/mailer.js";
 
+// export const loginUser = async (req, res) => {
+//   const { email, password } = req.body;
+//   const sql = "SELECT * FROM register WHERE email = ?";
+
+//   db.query(sql, [email], async (err, data) => {
+//     if (err) return res.status(500).json({ error: "Database error" });
+//      console.log(password,data[0]?.password);
+//     if (data.length > 0) {
+//       const result = await bcrypt.compare(password, data[0]?.password);
+//       console.log(result)
+//       if (result) {
+//         res.json({ Login: true, message: "Login successful", success:true });
+//       } else {
+//         res.json({ Login: false, message: "Invalid email or password",error:true });
+//       }
+//     } else {
+//       res.json({ Login: false, message: "User not found",error:true });
+//     }
+//   });
+// };
+
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
   const sql = "SELECT * FROM register WHERE email = ?";
@@ -10,18 +31,22 @@ export const loginUser = async (req, res) => {
     if (err) return res.status(500).json({ error: "Database error" });
 
     if (data.length > 0) {
+      console.log("Entered Password:", password);
+      console.log("Stored Hashed Password:", data[0]?.password);
       const result = await bcrypt.compare(password, data[0]?.password);
+      console.log("Password Match:", result);
 
       if (result) {
-        res.json({ Login: true, message: "Login successful" });
+        return res.json({ Login:true, message: "Login successful", success: true });
       } else {
-        res.json({ Login: false, message: "Invalid email or password" });
+        return res.json({ Login:false, message: "Invalid email or password", error: true });
       }
     } else {
-      res.json({ Login: false, message: "User not found" });
+      return res.json({ Login:false, message: "User not found", error: true });
     }
   });
 };
+
 
 export const registerUser = async (req, res) => {
   try {
@@ -32,21 +57,26 @@ export const registerUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    const sql2 = "SELECT COUNT(*) as count from register WHERE email= ?"
     const sql = "INSERT INTO register (name, email, password) VALUES (?, ?, ?)";
-
+    db.query(sql2,[email],(err,result) =>{
+      if(result[0].count>0){
+        return res.status(400).json({message: "Email already exist"})
+      }
+    })
     db.query(sql, [name, email, hashedPassword], (err, result) => {
       if (err) {
         if (err.code === "ER_DUP_ENTRY") {
-          return res.status(400).json({ error: "Email already exists" });
+          return res.status(400).json({ message: "Email already exists" });
         }
-        return res.status(500).json({ error: "Error inserting user", details: err.message });
+        return res.status(500).json({ message: "Error inserting user", details: err.message,error:true });
       }
 
-      return res.status(201).json({ message: "User registered successfully" });
+      return res.status(201).json({ message: "User registered successfully",success:true });
     });
 
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error", details: error.message });
+    res.status(500).json({ error: "Internal Server Error", details: error.message,error:true });
   }
 };
 
@@ -84,7 +114,12 @@ export const sendResetPasswordMail = async (req, res) => {
 
     const sql = "UPDATE register SET otp = ?, otp_expire = ? WHERE email = ?";
 
-    console.log("Executing SQL:", sql, "Values:", [otp, otp_expire, email]);
+    // console.log("Executing SQL:", sql, "Values:", [otp, otp_expire, email]);
+    // db.query("SHOW COLUMNS FROM register", (err, results) => {
+    //   if (err) console.error("Error fetching columns:", err);
+    //   else console.log("Table structure:", results);
+    // });
+    
 
     db.query(sql, [otp, otp_expire, email], (err, result) => {
       if (err) {
@@ -96,7 +131,7 @@ export const sendResetPasswordMail = async (req, res) => {
         console.log("Email not found in register table:", email);
         return res.status(400).json({ error: "Email not found" });
       }
-
+      
       // If successful, send OTP mail
       const mail = new Mail();
       mail.setTo(email);
@@ -111,14 +146,14 @@ export const sendResetPasswordMail = async (req, res) => {
         console.error("Mail send error:", mailError.message);
         return res.status(500).json({ error: "Failed to send OTP email" });
       }
+
+      
     });
   } catch (error) {
     console.error("Server error:", error.message);
     return res.status(500).json({ error: "Server error" });
   }
 };
-
-
 
 // export const resetPassword = async (req, res) => {
 //   const { email, password } = req.body;
@@ -185,3 +220,69 @@ export const resetPassword = async (req, res) => {
     });
   });
 };
+
+// export const resetPassword = async (req, res) => {
+//   const { email, password } = req.body;
+
+//   if (!email || !password) {
+//     return res.status(400).json({ message: "All fields are required" });
+//   }
+
+//   const sql = "SELECT * FROM register WHERE email = ?";
+//   db.query(sql, [email], async (err, results) => {
+//     if (err) {
+//       console.error("Database error:", err);
+//       return res.status(500).json({ message: "Database error" });
+//     }
+
+//     if (results.length === 0) {
+//       return res.status(400).json({ message: "Email not registered" });
+//     }
+
+//     // Hash the new password before saving
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     const updateSql = "UPDATE register SET password = ? WHERE email = ?";
+//     db.query(updateSql, [hashedPassword, email], (err, updateResult) => {
+//       if (err) {
+//         console.error("Failed to update password:", err);
+//         return res.status(500).json({ message: "Failed to update password" });
+//       }
+
+//       return res.status(200).json({ status: "Success", message: "Password reset successfully" });
+//     });
+//   });
+// };
+
+// export const resetPassword = async (req, res) => {
+//   const { email, otp, password } = req.body;
+
+//   if (!email || !otp || !password) {
+//       return res.status(400).json({ message: "All fields are required" });
+//   }
+
+//   const sql = "SELECT * FROM register WHERE email = ? AND otp = ?";
+//   db.query(sql, [email, otp], (err, results) => {
+//       if (err) {
+//           console.error("Database error:", err);
+//           return res.status(500).json({ message: "Database error" });
+//       }
+
+//       if (results.length === 0) {
+//           return res.status(400).json({ message: "Invalid email or OTP" });
+//       }
+
+//       // Optionally: hash the password before saving
+//       const hashedPassword = password; // Should use bcrypt.hash(password, saltRounds)
+
+//       const updateSql = "UPDATE register SET password = ?, otp = NULL, otp_expire = NULL WHERE email = ?";
+//       db.query(updateSql, [hashedPassword, email], (err, updateResult) => {
+//           if (err) {
+//               console.error("Failed to update password:", err);
+//               return res.status(500).json({ message: "Failed to update password" });
+//           }
+
+//           return res.status(200).json({ status: "Success", message: "Password reset successfully" });
+//       });
+//   });
+// };
