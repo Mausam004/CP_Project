@@ -8,8 +8,8 @@ const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'user',
-  port: process.env.DB_PORT || 3306,  // Must match XAMPP MySQL port!
+  database: process.env.DB_NAME || 'employee',
+  port: process.env.DB_PORT || 3306,  
 });
 
 pool.getConnection((err, connection) => {

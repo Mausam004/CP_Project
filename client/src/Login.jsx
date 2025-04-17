@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { ToastContainer , toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Validation from "./LoginValidation";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min";
+
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -18,40 +19,36 @@ function Login() {
 
     const newValues = { email, password };
     const validationErrors = Validation(newValues);
+    console.log("Validation errors on submit:",validationErrors);
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length > 0) {
+      toast.error("Please enter valid values");
       return;
     }
-
-    axios.post('http://localhost:8000/api/auth/login', { email, password })
-      .then((response) => {
-        toast.success("✅ Login Successful!", {
-          position: "top-center",
-          autoClose: 2000,
-        });
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 2000);
-      })
-      .catch((error) => {
-        if (error.response) {
-          toast.error(`Error:  ${error.response.data.error}`, {
-            position: "top-center",
-          });
-        } else {
-          toast.error(" Unable to connect to server!", {
-            position: "top-center",
-          });
+   try{
+    const response = await axios.post('http://localhost:8000/api/auth/login', { email, password })
+      console.log(response);
+      
+  console.log("Response received:", response?.data?.message);
+        toast.success(response?.data?.message);
+        console.log("response",response)
+        console.log(response.data.success)
+        if (response.data.success) {
+          localStorage.setItem("user", JSON.stringify(response.data.user)); // Save user data
+          navigate("/");
         }
-      });
-  };
+  }
+  catch(error){
+    toast.error(error?.response?.data?.message);
+  }
+}
 
   return (
     <div
       className="min-vh-100 d-flex justify-content-center align-items-center"
       style={{
-        backgroundImage: `url("/images/image.png")`, 
+        backgroundColor:"white", 
         backgroundSize: "cover",
         backgroundPosition: "center",
         position: "relative",
@@ -133,9 +130,12 @@ function Login() {
         <div className="mt-2">
           <Link to="/register" className="btn btn-outline-success w-100">
             Signup
+
+            
           </Link>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 }
