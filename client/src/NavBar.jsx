@@ -57,7 +57,7 @@ export default function NavBar() {
   {user ? (
     <>
       {user.role === "admin" && (
-        <button onClick={() => navigate("/admin-dashboard")}>
+        <button className="login-btn" onClick={() => navigate("/admin-dashboard")}>
           Admin Dashboard
         </button>
       )}
@@ -81,8 +81,8 @@ export default function NavBar() {
     </>
   ) : (
     <>
-      <button onClick={() => navigate("/login")}>Login</button>
-      <button onClick={() => navigate("/register")}>Register</button>
+      <button className="login-btn" onClick={() => navigate("/login")}>Login</button>
+      <button className="register-btn" onClick={() => navigate("/register")}>Register</button>
     </>
   )}
 </div>

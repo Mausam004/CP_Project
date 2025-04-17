@@ -32,11 +32,12 @@ export default function Signup() {
     try{
     const response = await axios.post('http://localhost:8000/api/auth/register', { name, email, password })
      
-        toast.success(response.data.message, {
-          position: "top-center",
-          autoClose: 2000
-        });
+       
         if(response.data.success){
+          toast.success(response.data.message, {
+            position: "top-center",
+            autoClose: 2000
+          });
           navigate("/login");}
       }
       catch(error){

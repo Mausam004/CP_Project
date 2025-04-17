@@ -63,28 +63,33 @@ export const registerUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const sql2 = "SELECT COUNT(*) as count from register WHERE email= ?"
-    const sql = "INSERT INTO register (name, email, password) VALUES (?, ?, ?)";
-    db.query(sql2,[email],(err,result) =>{
-      if(result[0].count>0){
-        return res.status(400).json({message: "Email already exist"})
-      }
-    })
-    db.query(sql, [name, email, hashedPassword], (err, result) => {
-      if (err) {
-        if (err.code === "ER_DUP_ENTRY") {
-          return res.status(400).json({ message: "Email already exists" });
-        }
-        return res.status(500).json({ message: "Error inserting user", details: err.message,error:true });
+
+    const checkQuery = "SELECT COUNT(*) as count FROM register WHERE email = ?";
+    db.query(checkQuery, [email], (checkErr, checkResult) => {
+      if (checkErr) {
+        return res.status(500).json({ message: "Database error", error: true });
       }
 
-      return res.status(201).json({ message: "User registered successfully",success:true });
+      if (checkResult[0].count > 0) {
+        return res.status(400).json({ message: "Email already exists", error: true });
+      }
+
+      const insertQuery = "INSERT INTO register (name, email, password, role) VALUES (?, ?, ?, ?)";
+      db.query(insertQuery, [name, email, hashedPassword, "user"], (insertErr, result) => {
+        if (insertErr) {
+          console.error("Insert Error:", insertErr);
+          return res.status(500).json({ message: "Failed to register user", error: true });
+        }
+
+        return res.status(201).json({ message: "User registered successfully", success: true });
+      });
     });
 
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error", details: error.message,error:true });
+    return res.status(500).json({ error: "Internal Server Error", details: error.message, error: true });
   }
 };
+
 
 export const verifyOtp = async (req, res) => {
  const {enteredOTP, email} = req.body;
