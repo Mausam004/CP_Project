@@ -1,7 +1,9 @@
 import bcrypt from "bcrypt";
 import db from "../config/db.js";
 import { Mail } from "../config/mailer.js";
-
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 // export const loginUser = async (req, res) => {
 //   const { email, password } = req.body;
 //   const sql = "SELECT * FROM register WHERE email = ?";
@@ -37,7 +39,11 @@ export const loginUser = async (req, res) => {
       console.log("Password Match:", result);
 
       if (result) {
-        return res.json({ Login:true, message: "Login successful", success: true });
+
+        const user = { id: data[0].id, role: data[0].role, email: data[0].email };
+        const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "1h" });
+
+        return res.json({ Login:true, message: "Login successful", success: true,token,user });
       } else {
         return res.json({ Login:false, message: "Invalid email or password", error: true });
       }

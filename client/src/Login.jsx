@@ -16,32 +16,36 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const newValues = { email, password };
     const validationErrors = Validation(newValues);
-    console.log("Validation errors on submit:",validationErrors);
     setErrors(validationErrors);
-
+  
     if (Object.keys(validationErrors).length > 0) {
       toast.error("Please enter valid values");
       return;
     }
-   try{
-    const response = await axios.post('http://localhost:8000/api/auth/login', { email, password })
-      console.log(response);
-      
-  console.log("Response received:", response?.data?.message);
-        toast.success(response?.data?.message);
-        console.log(response.data.success)
-        if(response.data.success){
-            navigate("/");
-      
+  
+    try {
+      const response = await axios.post('http://localhost:8000/api/auth/login', { email, password });
+  
+      console.log("Response received:", response?.data?.message);
+      toast.success(response?.data?.message);
+  
+      if (response.data.success) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+  
+        if (response.data.user?.role === "admin") {
+          navigate("/admin-dashboard"); // ✅ only for admins
+        } else {
+          navigate("/"); // ✅ or stay on same page if you prefer
         }
-  }
-  catch(error){
-    toast.error(error?.response?.data?.message);
-  }
-}
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Login failed");
+    }
+  };
 
   return (
     <div
