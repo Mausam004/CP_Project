@@ -35,9 +35,19 @@ export const loginUser = async (req, res) => {
       console.log("Stored Hashed Password:", data[0]?.password);
       const result = await bcrypt.compare(password, data[0]?.password);
       console.log("Password Match:", result);
-
+      console.log("data",data)
       if (result) {
-        return res.json({ Login:true, message: "Login successful", success: true });
+        return res.json({
+          Login: true,
+          message: "Login successful",
+          success: true,
+          user: {
+            id: data[0].id,
+            name: data[0].name,
+            email: data[0].email,
+          },
+        });
+        
       } else {
         return res.json({ Login:false, message: "Invalid email or password", error: true });
       }

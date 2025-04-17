@@ -48,7 +48,7 @@ export default function Signup() {
     <div
       className="min-vh-100 d-flex justify-content-center align-items-center"
       style={{
-        backgroundImage: `url("/images/image.png")`, 
+        backgroundColor: "white", 
         backgroundSize: "cover",
         backgroundPosition: "center",
         position: "relative",

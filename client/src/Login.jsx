@@ -32,10 +32,11 @@ function Login() {
       
   console.log("Response received:", response?.data?.message);
         toast.success(response?.data?.message);
+        console.log("response",response)
         console.log(response.data.success)
-        if(response.data.success){
-            navigate("/");
-      
+        if (response.data.success) {
+          localStorage.setItem("user", JSON.stringify(response.data.user)); // Save user data
+          navigate("/");
         }
   }
   catch(error){
@@ -47,7 +48,7 @@ function Login() {
     <div
       className="min-vh-100 d-flex justify-content-center align-items-center"
       style={{
-        backgroundImage: `url("/images/image.png")`, 
+        backgroundColor:"white", 
         backgroundSize: "cover",
         backgroundPosition: "center",
         position: "relative",
@@ -129,6 +130,8 @@ function Login() {
         <div className="mt-2">
           <Link to="/register" className="btn btn-outline-success w-100">
             Signup
+
+            
           </Link>
         </div>
       </div>

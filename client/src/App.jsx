@@ -6,6 +6,7 @@ import ForgotPassword from "./ForgotPassword";
 import ResetPassword from "./ResetPassword";
 import BusPass from "./BusPass";
 import OtpForm from "./OtpForm";
+import Profile from "./Profile";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import NavBar from "./NavBar";
@@ -20,6 +21,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/register" element={<Signup />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/otp-form/:email" element={<OtpForm />} />

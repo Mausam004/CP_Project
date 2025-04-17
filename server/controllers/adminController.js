@@ -39,3 +39,35 @@ export const addBusPass = async (req, res) => {
     }
 };
 
+export const getPlacedForAdminApproval = async (req, res) => {
+    const { status } = req.body;
+    const sql = "SELECT * FROM bus_passes WHERE is_approve = ? ORDER BY created_at DESC";
+
+    db.query(sql, [status], (err, result) => {
+      if (err) {
+          return res.status(400).json({ error: "No Place Found" });
+      }
+
+      return res.status(201).json({ message: "Request List", data: result });
+    });
+};
+
+export const updatePlaceApplication = async (req, res) => {
+    const { placeId, isApprove } = req.body;
+
+    if (typeof placeId === 'undefined' || (isApprove !== 1 && isApprove !== 2)) {
+      return res.status(400).json({ error: "Invalid input" });
+    }
+  
+    const sql = "UPDATE bus_passes SET is_approve = ? WHERE id = ?";
+  
+    db.query(sql, [isApprove, placeId], (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: "Database error", details: err });
+      }
+  
+      return res.status(200).json({
+        message: isApprove === 1 ? "Place approved successfully" : "Place rejected successfully",
+      });
+    });
+  };
