@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./BusPass.css"; 
 import axios from "axios";
@@ -22,7 +22,7 @@ function BusPass() {
     residentialAddress: "",
     photo: null,
   });
-
+  
   const cityFees = {
     Ahmedabad: 15000,
     Gandhinagar: 14000,
@@ -46,24 +46,45 @@ function BusPass() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const formDataToSend = new FormData();
-    Object.keys(formData).forEach((key) => {
-        if (key === "photo" && formData[key] instanceof File) {
-            formDataToSend.append(key, formData[key]);
-        } else if (key !== "photo") {
-            formDataToSend.append(key, formData[key]);
-        }
-    });
-
+  
     try {
+      // ✅ First check if pass already exists
+      const check = await axios.get(`http://localhost:8000/api/adminroutes/check-pass/${formData.enrollmentNumber}`);
+      
+      if (check.data.exists) {
+        toast.info("Bus pass already requested. Redirecting...");
+        navigate('/generated-pass', {
+          state: {
+            formData: check.data.pass,
+            status: check.data.pass.status
+          }
+        });
+        return;
+      }
+  
+      // ✅ If not exists, then proceed to submit
+      const formDataToSend = new FormData();
+      Object.keys(formData).forEach((key) => {
+        if (key === "photo" && formData[key] instanceof File) {
+          formDataToSend.append(key, formData[key]);
+        } else if (key !== "photo") {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+  
       const response = await axios.post("http://localhost:8000/api/adminroutes/create-buspass", formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      
+  
       if (response.status === 201) {
         toast.success("Bus Pass Submitted Successfully!");
-        navigate('/generated-pass',{ state: { formData } });
+        navigate('/generated-pass', {
+          state: {
+            formData: formData,
+            status: "pending"
+          }
+        });
+  
         setFormData({
           studentName: "",
           enrollmentNumber: "",
@@ -79,8 +100,8 @@ function BusPass() {
         });
       }
     } catch (error) {
-      console.log("error",error.message)
-      toast.error("Failed to submit bus pass. Try again.");
+      console.error("Submission error:", error);
+      toast.error("Something went wrong!");
     }
   };
 

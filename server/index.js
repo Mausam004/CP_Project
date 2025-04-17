@@ -7,11 +7,14 @@ import adminRoutes from "./routes/adminroutes.js";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5174", // or "*" if testing
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use("/api/auth", authRoutes);
-app.use("/api/admin", adminRoutes);
+app.use("/api/adminroutes", adminRoutes);
 app.use("/uploads",express.static("uploads"));
 
 app.get("/",  (req, res) => {

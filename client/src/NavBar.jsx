@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
 import "./NavBar.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
+import { FaUserCircle } from "react-icons/fa";
 export default function NavBar() {
   const navigate = useNavigate();
 
@@ -44,25 +44,48 @@ export default function NavBar() {
           <Link to="/about-us" className={location.pathname === "/about-us" ? "active" : ""}>About Us</Link>
           <Link to="/service" className={location.pathname === "/service" ? "active" : ""}>Services</Link>
           <Link to="/contacts" className={location.pathname === "/contacts" ? "active" : ""}>Contacts</Link>
+          {user && (
+    <Link to="/buspass" className={location.pathname === "/buspass" ? "active" : ""}>
+      Bus Pass
+    </Link>
+  )}
         </ul>
       </div>
 
       {/* Auth Buttons */}
       <div className="nav-actions" style={{ display: "flex", gap: "20px" }}>
-        {user ? (
-          <>
-            <button className="profile-btn" onClick={() => navigate("/profile")}>
-              {user?.name || "Profile"}
-            </button>
-            <button className="logout-btn" onClick={handleLogout}>Logout</button>
-          </>
-        ) : (
-          <>
-            <button className="login-btn" onClick={() => navigate("/login")}>Login</button>
-            <button className="register-btn" onClick={() => navigate("/register")}>Register</button>
-          </>
-        )}
-      </div>
+  {user ? (
+    <>
+      {user.role === "admin" && (
+        <button onClick={() => navigate("/admin-dashboard")}>
+          Admin Dashboard
+        </button>
+      )}
+
+      {/* ✅ This part was broken — now fixed */}
+      {location.pathname === "/profile" ? (
+        <div className="profile-dropdown">
+          <ul className="profile-menu">
+            <li onClick={() => navigate("/profile")}>My Profile</li>
+          </ul>
+        </div>
+      ) : (
+        <FaUserCircle 
+          className="profile-icon" 
+          size={28} 
+          onClick={() => navigate("/profile")} 
+        />
+      )}
+
+     
+    </>
+  ) : (
+    <>
+      <button onClick={() => navigate("/login")}>Login</button>
+      <button onClick={() => navigate("/register")}>Register</button>
+    </>
+  )}
+</div>
     </nav>
   );
 }

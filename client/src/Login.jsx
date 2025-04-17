@@ -30,17 +30,15 @@ function Login() {
       const response = await axios.post('http://localhost:8000/api/auth/login', { email, password });
   
       console.log("Response received:", response?.data?.message);
-      toast.success(response?.data?.message);
+      
   
       if (response.data.success) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
-  
-        if (response.data.user?.role === "admin") {
-          navigate("/admin-dashboard"); // ✅ only for admins
-        } else {
+        toast.success(response?.data?.message);
+        
           navigate("/"); // ✅ or stay on same page if you prefer
-        }
+        
       }
     } catch (error) {
       toast.error(error?.response?.data?.message || "Login failed");
