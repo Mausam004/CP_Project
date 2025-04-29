@@ -13,6 +13,8 @@ import NavBar from "./NavBar";
 import AboutUs from "./AboutUs";
 import GeneratedPass from "./GeneratedPass";
 
+import AdminDashboard from "./AdminDashboard";
+
 function App() {
   return (
     <BrowserRouter>
@@ -29,7 +31,9 @@ function App() {
         <Route path="/about-us" element={<AboutUs/>}/>
         <Route path="/navbar" element={<NavBar/>}/>
         <Route path="/generated-pass" element={<GeneratedPass/>}/>
+        <Route path="/admin-dashboard" element={<AdminDashboard/>}/>
       </Routes>
+      
 
       {/* ToastContainer must be included once in the App */}
       <ToastContainer />

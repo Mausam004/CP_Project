@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./BusPass.css"; 
 import axios from "axios";
@@ -11,34 +11,72 @@ function BusPass() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     studentName: "",
+    email: "",
     enrollmentNumber: "",
     contactNumber: "",
+    parentNumber: "",
     semester: "",
     branch: "",
     college: "",
     shift: "",
     city: "",
+    pickupStand: "",
     fees: "",
     residentialAddress: "",
     photo: null,
   });
-
+  
   const cityFees = {
     Ahmedabad: 15000,
     Gandhinagar: 14000,
-    Palanpur: 13500,
-    Patan: 12500,
     Mehsana: 5000,
+    Himmatnagar: 7000,
+    Vijapur: 8000,
+    Unjha: 1000,
+    Siddhpur: 12500,
+    Patan: 11000,
+    Palanpur: 13500,
+  };
+
+  const pickupStands = {
+    Ahmedabad: [
+      "Isanpur", "Godasar", "Jasodanagar", "Baroda Express", "CTM", "Wonder Point", "Rabari Colony",
+      "Rajendra Nagar", "Soni-ni-Chali", "Virat Nagar", "Khodiyarnagar", "Thakkarnagar",
+      "Bajrang Ashram", "Vijaypark", "Krishnanagar", "Galaxy", "Kotarpur", "India Bridge",
+      "Bhat Circle", "Koba", "Kamlam", "PDPU", "Raysan", "Raksha Shakti Cr.", "CH0 to GH7",
+      "Charedi", "Pethapur"
+    ],
+    Gandhinagar: [
+      "Shyamal", "Shivranjani", "Keshavbaug", "Andhjan Mandal", "Topa Circle", "AEC", "Pallav", 
+      "Akhbarnagar", "RTO", "Sabarmati ST", "Vishat", "Chandkhda", "Zundal", "Gandhinagar GH (ઘ) Road"
+    ],
+    Patan: [
+      "GEB", "GayatriMandir", "Bus Stand", "Uni.Road", "Balisana"
+    ],
+    Mehsana: [
+      "Radhanpur Road", "Golden Circle Rajdhani township", "Radhanpur Char Rasta", "Gopinala", "Bus Stand", 
+      "ZulelalChok", "Dhobighat", "Para Tower", "Saibaba-Mandir", "Modhera Road", "Man Pharma", 
+      "Avsar Party Plot", "Nirma/FCI", "Rajkamal Petrol pump", "Gayatri Mandir", "Nagalpur", "Wide Angle", "Palavasna"
+    ],
+    Unjha: [ "Bus Stand", "Highway Circle" ],
+    Vijapur : [ "Iskcon", "Pakvana", "Thaltej", "Zudas", "Highcourt", "Gota", "Vaishnav Devi", "Adalaj", "Kh0 To KH 6", "Radheja" ],
+    Himmatnagar: [ "Gadhoda Circle", "Mahavir Nagar", "Post office", "Mehta Pura", "RTO", "Vijapur", "Dabhala" ],
+    Siddhpur: [ "Kakoshi Chokadi", "Dethli char rasta","Bindu sarovar" ,"Khali chokadi" ],
+
+    Palanpur: [
+      "Gathaman Gate", "ST workshop", "Aroma Circle", "Kanodar", "Chhapi", "Dhethli Road", "BinduSarovar"
+    ]
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "city") {
-      setFormData({ ...formData, city: value, fees: cityFees[value] || "" });
+      setFormData({ ...formData, city: value, fees: cityFees[value] || "",pickupStand:pickupStands[value] });
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
+
 
   const handleFileChange = (e) => {
     setFormData({ ...formData, photo: e.target.files[0] });
@@ -46,26 +84,48 @@ function BusPass() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const formDataToSend = new FormData();
-    Object.keys(formData).forEach((key) => {
-        if (key === "photo" && formData[key] instanceof File) {
-            formDataToSend.append(key, formData[key]);
-        } else if (key !== "photo") {
-            formDataToSend.append(key, formData[key]);
-        }
-    });
-
+  
     try {
+      // ✅ First check if pass already exists
+      const check = await axios.get(`http://localhost:8000/api/adminroutes/check-pass/${formData.enrollmentNumber}`);
+      
+      if (check.data.exists) {
+        toast.info("Bus pass already requested. Redirecting...");
+        navigate('/generated-pass', {
+          state: {
+            formData: check.data.pass,
+            status: check.data.pass.status
+          }
+        });
+        return;
+      }
+  
+      // ✅ If not exists, then proceed to submit
+      const formDataToSend = new FormData();
+      Object.keys(formData).forEach((key) => {
+        if (key === "photo" && formData[key] instanceof File) {
+          formDataToSend.append(key, formData[key]);
+        } else if (key !== "photo") {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+  
       const response = await axios.post("http://localhost:8000/api/adminroutes/create-buspass", formDataToSend, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      
+  
       if (response.status === 201) {
         toast.success("Bus Pass Submitted Successfully!");
-        navigate('/generated-pass',{ state: { formData } });
+        navigate('/generated-pass', {
+          state: {
+            formData: formData,
+            status: "pending"
+          }
+        });
+  
         setFormData({
           studentName: "",
+          email: "",
           enrollmentNumber: "",
           contactNumber: "",
           semester: "",
@@ -79,8 +139,8 @@ function BusPass() {
         });
       }
     } catch (error) {
-      console.log("error",error.message)
-      toast.error("Failed to submit bus pass. Try again.");
+      console.error("Submission error:", error);
+      toast.error("Something went wrong!");
     }
   };
 
@@ -94,12 +154,20 @@ function BusPass() {
             <input type="text" name="studentName" className="form-control" value={formData.studentName} onChange={handleChange} required />
           </div>
           <div className="mb-3">
+            <label className="form-label fw-bold">Student Email</label>
+            <input type="text" name="email" className="form-control" value={formData.email} onChange={handleChange} required />
+          </div>
+          <div className="mb-3">
             <label className="form-label fw-bold">Enrollment Number</label>
             <input type="text" name="enrollmentNumber" className="form-control" value={formData.enrollmentNumber} onChange={handleChange} required />
           </div>
           <div className="mb-3">
             <label className="form-label fw-bold">Contact Number</label>
             <input type="text" name="contactNumber" className="form-control" value={formData.contactNumber} onChange={handleChange} required />
+          </div>
+          <div className="mb-3">
+            <label className="form-label fw-bold">Parent Number</label>
+            <input type="text" name="parentNumber" className="form-control" value={formData.parentNumber} onChange={handleChange} required />
           </div>
           <div className="row">
             <div className="col-md-6 mb-3">
@@ -132,6 +200,16 @@ function BusPass() {
               ))}
             </select>
           </div>
+          <div className="mb-3">
+            <label className="form-label fw-bold">Pickup Stand</label>
+            <select name="pickupStand" className="form-control" onChange={handleChange} required>
+              <option value="">Select Pickup Stand</option>
+              {formData.city && pickupStands[formData.city]?.map((pickupStand) => (
+                <option key={pickupStand} value={pickupStand}>{pickupStand}</option>
+              ))}
+            </select>
+          </div>
+
           <div className="mb-3">
             <label className="form-label fw-bold">Fees</label>
             <input type="text" name="fees" className="form-control" value={formData.fees} readOnly />

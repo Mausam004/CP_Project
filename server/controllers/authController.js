@@ -1,7 +1,9 @@
 import bcrypt from "bcrypt";
 import db from "../config/db.js";
 import { Mail } from "../config/mailer.js";
-
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 // export const loginUser = async (req, res) => {
 //   const { email, password } = req.body;
 //   const sql = "SELECT * FROM register WHERE email = ?";
@@ -35,19 +37,13 @@ export const loginUser = async (req, res) => {
       console.log("Stored Hashed Password:", data[0]?.password);
       const result = await bcrypt.compare(password, data[0]?.password);
       console.log("Password Match:", result);
-      console.log("data",data)
+      console.log("result",result)
       if (result) {
-        return res.json({
-          Login: true,
-          message: "Login successful",
-          success: true,
-          user: {
-            id: data[0].id,
-            name: data[0].name,
-            email: data[0].email,
-          },
-        });
-        
+
+        const user = { id: data[0].id, role: data[0].role, email: data[0].email };
+        const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "1h" });
+
+        return res.json({ Login:true, message: "Login successful", success: true,token,user });
       } else {
         return res.json({ Login:false, message: "Invalid email or password", error: true });
       }
@@ -67,28 +63,33 @@ export const registerUser = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const sql2 = "SELECT COUNT(*) as count from register WHERE email= ?"
-    const sql = "INSERT INTO register (name, email, password) VALUES (?, ?, ?)";
-    db.query(sql2,[email],(err,result) =>{
-      if(result[0].count>0){
-        return res.status(400).json({message: "Email already exist"})
-      }
-    })
-    db.query(sql, [name, email, hashedPassword], (err, result) => {
-      if (err) {
-        if (err.code === "ER_DUP_ENTRY") {
-          return res.status(400).json({ message: "Email already exists" });
-        }
-        return res.status(500).json({ message: "Error inserting user", details: err.message,error:true });
+
+    const checkQuery = "SELECT COUNT(*) as count FROM register WHERE email = ?";
+    db.query(checkQuery, [email], (checkErr, checkResult) => {
+      if (checkErr) {
+        return res.status(500).json({ message: "Database error", error: true });
       }
 
-      return res.status(201).json({ message: "User registered successfully",success:true });
+      if (checkResult[0].count > 0) {
+        return res.status(400).json({ message: "Email already exists", error: true });
+      }
+
+      const insertQuery = "INSERT INTO register (name, email, password, role) VALUES (?, ?, ?, ?)";
+      db.query(insertQuery, [name, email, hashedPassword, "user"], (insertErr, result) => {
+        if (insertErr) {
+          console.error("Insert Error:", insertErr);
+          return res.status(500).json({ message: "Failed to register user", error: true });
+        }
+
+        return res.status(201).json({ message: "User registered successfully", success: true });
+      });
     });
 
   } catch (error) {
-    res.status(500).json({ error: "Internal Server Error", details: error.message,error:true });
+    return res.status(500).json({ error: "Internal Server Error", details: error.message, error: true });
   }
 };
+
 
 export const verifyOtp = async (req, res) => {
  const {enteredOTP, email} = req.body;

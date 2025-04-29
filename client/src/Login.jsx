@@ -16,39 +16,39 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const newValues = { email, password };
     const validationErrors = Validation(newValues);
-    console.log("Validation errors on submit:",validationErrors);
     setErrors(validationErrors);
-
+  
     if (Object.keys(validationErrors).length > 0) {
       toast.error("Please enter valid values");
       return;
     }
-   try{
-    const response = await axios.post('http://localhost:8000/api/auth/login', { email, password })
-      console.log(response);
+  
+    try {
+      const response = await axios.post('http://localhost:8000/api/auth/login', { email, password });
+  
+      console.log("Response received:", response?.data?.message);
       
-  console.log("Response received:", response?.data?.message);
+  
+      if (response.data.success) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
         toast.success(response?.data?.message);
-        console.log("response",response)
-        console.log(response.data.success)
-        if (response.data.success) {
-          localStorage.setItem("user", JSON.stringify(response.data.user)); // Save user data
-          navigate("/");
-        }
-  }
-  catch(error){
-    toast.error(error?.response?.data?.message);
-  }
-}
+        
+          navigate("/"); // ✅ or stay on same page if you prefer
+        
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Login failed");
+    }
+  };
 
   return (
     <div
       className="min-vh-100 d-flex justify-content-center align-items-center"
       style={{
-        backgroundColor:"white", 
         backgroundSize: "cover",
         backgroundPosition: "center",
         position: "relative",
@@ -130,8 +130,6 @@ function Login() {
         <div className="mt-2">
           <Link to="/register" className="btn btn-outline-success w-100">
             Signup
-
-            
           </Link>
         </div>
       </div>

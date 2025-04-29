@@ -37,7 +37,7 @@ export const createBusPass = (req, res) => {
 
 
 export const getBusPasses = (req, res) => {
-  const sqlGetBusPasses = "SELECT * FROM bus_passes WHERE is_approve = 1 ORDER BY created_at DESC";
+  const sqlGetBusPasses = "SELECT * FROM bus_passes ORDER BY created_at DESC";
 
   db.query(sqlGetBusPasses, (err, results) => {
     if (err) {

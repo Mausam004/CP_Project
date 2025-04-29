@@ -1,95 +1,173 @@
-/* Hero Section */
 .hero-container {
-    position: relative;
-    width: 100vw;
-    height: 90vh; /* Below Navbar */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    color: white;
-    background-image: url('/images/image.png'); /* Update with your bus image path */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+  position: relative;
+  width: 100vw;
+  height: 90vh;
+  overflow: hidden;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Dark Overlay for Readability */
+.hero-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
 .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Dark opacity */
-    z-index: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 1;
 }
 
-/* Hero Content Styling */
 .hero-content {
-    position: relative;
-    z-index: 1;
-    max-width: 800px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Center text vertically */
-    align-items: center; /* Center text horizontally */
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+  height: 100%;
+  padding: 20px;
 }
 
 .hero-content h2 {
-    font-size: 22px;
-    letter-spacing: 2px;
-    font-weight: 300;
-    color: #f0f0f0;
+  font-size: 22px;
+  font-weight: 300;
+  color: #f0f0f0;
+  letter-spacing: 2px;
 }
 
 .hero-content h1 {
-    font-size: 55px;
-    font-weight: bold;
-    margin: 10px 0;
-    text-transform: uppercase;
+  font-size: 55px;
+  font-weight: bold;
+  margin: 10px 0;
+  text-transform: uppercase;
 }
 
 .hero-content p {
-    font-size: 20px;
-    max-width: 600px;
-    margin-bottom: 20px;
-    color: #ddd;
+  font-size: 20px;
+  max-width: 600px;
+  margin-top: 20px;
+  color: #ddd;
 }
 
-/* Buttons Styling */
-.hero-buttons {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
+.transportation-section {
+  padding: 60px 20px;
+  background-color: #f0f8ff; /* Light blue background */
+  text-align: center;
 }
 
-.btn-primary,
-.btn-secondary {
-    padding: 12px 24px;
-    font-size: 18px;
-    border: none;
-    cursor: pointer;
-    border-radius: 25px;
-    transition: all 0.3s ease-in-out;
+.transportation-section h2 {
+  font-size: 36px;
+  color: #003366; /* Dark blue text */
+  margin-bottom: 30px;
 }
 
-.btn-primary {
-    background-color: #083566;
-    color: white;
+.transportation-table {
+  width: 80%;
+  margin: 0 auto;
+  border-collapse: collapse;
+  background-color: #ffffff; /* White background for table */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.btn-primary:hover {
-    background-color: #0056b3;
+.transportation-table th,
+.transportation-table td {
+  border: 1px solid #ccc;
+  padding: 12px 20px;
+  text-align: left;
+  font-size: 16px;
 }
 
-.btn-secondary {
-    background-color: transparent;
-    border: 2px solid white;
-    color: white;
+.transportation-table th {
+  background-color: #003366; /* Dark blue header */
+  color: #ffffff;
 }
 
-.btn-secondary:hover {
-    background-color: white;
-    color: #697c90;
+.transportation-table tr:nth-child(even) {
+  background-color: #e6f2ff; /* Light blue for even rows */
+}
+
+
+.fees-section {
+  padding: 40px 20px;
+  background-color: #f1f8ff;
+  text-align: center;
+}
+
+.fees-section h2 {
+  font-size: 30px;
+  color: #003366;
+  margin-bottom: 20px;
+}
+
+.fees-table,
+.pickup-table {
+  margin: 0 auto;
+  border-collapse: collapse;
+  width: 80%;
+  background-color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.fees-table th,
+.fees-table td,
+.pickup-table th,
+.pickup-table td {
+  padding: 15px;
+  border: 1px solid #d0e2f2;
+  text-align: left;
+}
+
+.fees-table thead,
+.pickup-table thead {
+  background-color: #003366;
+  color: white;
+}
+
+.fees-table tr:nth-child(even),
+.pickup-table tr:nth-child(even) {
+  background-color: #eaf4ff;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.clickable-row:hover {
+  background-color: #d0eaff;
+}
+
+.pickup-table-container {
+  margin-top: 40px;
+}
+
+.pickup-table-container h3 {
+  color: #003366;
+  margin-bottom: 20px;
+}
+
+.back-button {
+  margin-bottom: 20px;
+  padding: 8px 16px;
+  background-color: #003366;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  float: left;
+}
+
+.back-button:hover {
+  background-color: #0055a5;
 }
